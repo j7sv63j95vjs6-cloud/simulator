@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#04060B" />
+<title>LIFE STADIUM — 生きるエネルギー大爆発時計</title>
+<meta name="description" content="生年月日と想定寿命を入れるだけ。これまで生きてきた奇跡と、これからの挑戦を、スタジアムのゴールのように全肯定して祝う超ポジティブな人生時計。残り時間がリアルタイムで減り、命の鼓動と共に光が脈打つ。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{ --pink:#FF2E88; --cyan:#00E5FF; --gold:#FFD54A; --text:#EAF3FF; --muted:#8b98b6;
+    --panel:rgba(14,20,38,0.62); --line:rgba(255,46,136,0.22); }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; background:#04060B; }
+  body{ font-family:'Noto Sans JP',system-ui,sans-serif; color:var(--text); overflow-x:hidden;
+    -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent; }
+  #fx{ position:fixed; inset:0; z-index:0; display:block; touch-action:none; }
+
+  .wrap{ position:relative; z-index:1; max-width:500px; margin:0 auto;
+    min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; justify-content:center;
+    padding:36px 18px 48px; pointer-events:none; }
+  .wrap > *{ pointer-events:auto; }
+
+  .eyebrow{ font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:0.68rem; letter-spacing:0.3em; text-align:center;
+    color:var(--pink); margin:0 0 6px; text-shadow:0 0 14px rgba(255,46,136,0.6); }
+  h1{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(1.7rem,7vw,2.3rem); text-align:center; margin:0 0 6px; letter-spacing:0.03em;
+    background:linear-gradient(100deg,var(--pink),var(--cyan)); background-size:200% 100%;
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    filter:drop-shadow(0 0 18px rgba(255,46,136,0.4)); animation:flow 6s linear infinite; }
+  @keyframes flow{ to{ background-position:200% 0; } }
+  .tagline{ text-align:center; color:var(--muted); font-size:0.85rem; margin:0 0 24px; }
+
+  .panel{ background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:22px 20px;
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 20px 50px rgba(0,0,0,0.5), 0 0 40px rgba(255,46,136,0.06); }
+  .panel + .panel, .card-wrap, .hero, #bonus, .grid, .measure, #shareRow{ margin-top:16px; }
+
+  .hero{ text-align:center; }
+  .hero-label{ font-family:'Space Grotesk',sans-serif; font-size:0.74rem; letter-spacing:0.2em; color:var(--cyan); margin:0 0 6px; text-shadow:0 0 12px rgba(0,229,255,0.6); }
+  .years{ display:inline-block; font-family:'Space Grotesk',sans-serif; font-weight:700; font-variant-numeric:tabular-nums;
+    font-size:clamp(2.1rem,10vw,3.4rem); line-height:1.05; letter-spacing:-0.01em; white-space:nowrap; color:#fff;
+    text-shadow:0 0 10px #fff, 0 0 28px rgba(255,46,136,0.8), 0 0 52px rgba(0,229,255,0.55); animation:hb 0.82s ease-in-out infinite; }
+  .years .u{ font-size:0.42em; color:var(--muted); margin-left:4px; -webkit-text-fill-color:initial; }
+  @keyframes hb{ 0%,100%{ transform:scale(1); } 8%{ transform:scale(1.05); } 20%{ transform:scale(1.015); } 30%{ transform:scale(1.035); } 45%{ transform:scale(1); } }
+  .subline{ font-family:'Space Grotesk',sans-serif; font-weight:600; color:var(--text); font-size:0.98rem; font-variant-numeric:tabular-nums; margin:8px 0 0; }
+  .burn{ color:var(--gold); font-weight:700; font-size:0.92rem; margin:12px 0 0; text-shadow:0 0 14px rgba(255,213,74,0.6); }
+
+  #bonus{ text-align:center; border-color:rgba(255,213,74,0.5); box-shadow:0 20px 50px rgba(0,0,0,0.5), 0 0 40px rgba(255,213,74,0.2); }
+  #bonus .bl{ font-family:'Space Grotesk',sans-serif; font-size:0.74rem; letter-spacing:0.2em; color:var(--gold); margin:0 0 6px; }
+  #bonus .bd{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:2.2rem; color:var(--gold); font-variant-numeric:tabular-nums; text-shadow:0 0 22px rgba(255,213,74,0.7); }
+
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .stat{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px; }
+  .stat .k{ font-size:0.74rem; color:var(--muted); margin:0 0 4px; }
+  .stat .v{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.35rem; font-variant-numeric:tabular-nums; margin:0; letter-spacing:-0.01em; }
+  .stat.pink .v{ color:var(--pink); } .stat.cyan .v{ color:var(--cyan); } .stat.gold .v{ color:var(--gold); }
+  .stat .v span{ font-size:0.56em; color:var(--muted); font-weight:500; margin-left:2px; font-family:'Noto Sans JP',sans-serif; }
+
+  label.fl{ display:block; font-size:0.82rem; font-weight:500; color:#c6d3ea; margin:0 0 8px; }
+  .field + .field{ margin-top:18px; }
+  input[type=date]{ width:100%; padding:13px 14px; border-radius:12px; background:rgba(4,6,11,0.6); border:1px solid var(--line); color:var(--text); font:inherit; font-size:1rem; outline:none; }
+  input[type=date]:focus{ border-color:var(--pink); box-shadow:0 0 0 3px rgba(255,46,136,0.18); }
+  .life-row{ display:flex; align-items:center; gap:14px; }
+  .life-row b{ font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--cyan); min-width:3ch; text-align:right; font-variant-numeric:tabular-nums; }
+  .life-row .u{ color:var(--muted); font-size:0.85rem; margin-left:-8px; }
+  input[type=range]{ -webkit-appearance:none; appearance:none; flex:1; height:30px; background:transparent; cursor:pointer; }
+  input[type=range]::-webkit-slider-runnable-track{ height:6px; border-radius:999px; background:linear-gradient(90deg,var(--pink) var(--fill,0%),rgba(120,140,170,0.22) var(--fill,0%)); }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:22px; height:22px; margin-top:-8px; border-radius:50%; background:#fff; box-shadow:0 0 12px rgba(255,46,136,0.9),0 0 0 4px rgba(255,46,136,0.16); }
+  input[type=range]::-moz-range-track{ height:6px; border-radius:999px; background:rgba(120,140,170,0.22); }
+  input[type=range]::-moz-range-progress{ height:6px; border-radius:999px; background:var(--pink); }
+  input[type=range]::-moz-range-thumb{ width:22px; height:22px; border:none; border-radius:50%; background:#fff; box-shadow:0 0 12px rgba(255,46,136,0.9),0 0 0 4px rgba(255,46,136,0.16); }
+
+  .measure{ display:block; width:100%; appearance:none; border:none; cursor:pointer;
+    font-family:'Space Grotesk','Noto Sans JP',sans-serif; font-weight:700; font-size:1.05rem; letter-spacing:0.03em; color:#12040c;
+    padding:16px; border-radius:14px; background:linear-gradient(120deg,var(--gold),var(--pink),var(--cyan)); background-size:200% 100%;
+    box-shadow:0 10px 30px rgba(255,46,136,0.35),0 0 44px rgba(0,229,255,0.24); animation:flow 4s linear infinite; transition:transform .12s; }
+  .measure:active{ transform:scale(0.98); }
+  .err{ color:#ff9db8; font-size:0.82rem; text-align:center; margin:10px 0 0; display:none; }
+
+  #shareRow{ display:flex; flex-direction:column; gap:12px; }
+  .share{ display:inline-flex; align-items:center; justify-content:center; gap:9px; text-decoration:none; font-weight:700; font-size:0.98rem; color:#122;
+    background:linear-gradient(120deg,var(--cyan),var(--pink)); border-radius:14px; padding:14px; box-shadow:0 10px 28px rgba(0,229,255,0.3); transition:transform .12s; }
+  .share:active{ transform:scale(0.98); }
+  .banner{ display:block; text-decoration:none; text-align:center; color:#DCEBFF; font-size:0.86rem; font-weight:500; padding:13px 14px; border-radius:14px;
+    border:1px solid rgba(255,213,74,0.5); background:linear-gradient(180deg,rgba(255,213,74,0.10),rgba(0,229,255,0.05));
+    box-shadow:0 0 20px rgba(255,213,74,0.22), inset 0 0 16px rgba(0,229,255,0.06); animation:bglow 3.4s ease-in-out infinite; transition:transform .12s; }
+  .banner b{ color:var(--cyan); font-weight:700; } .banner:active{ transform:scale(0.99); }
+  @keyframes bglow{ 0%,100%{ box-shadow:0 0 16px rgba(255,213,74,0.18), inset 0 0 14px rgba(0,229,255,0.05); } 50%{ box-shadow:0 0 30px rgba(255,46,136,0.32), inset 0 0 20px rgba(0,229,255,0.10); } }
+
+  .disclaimer{ text-align:center; color:var(--muted); font-size:0.73rem; line-height:1.7; margin:26px auto 0; max-width:40ch; }
+  .hidden{ display:none !important; }
+  @media (prefers-reduced-motion:reduce){ h1,.measure,.banner,.years{ animation:none; } }
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+
+<main class="wrap">
+  <header>
+    <p class="eyebrow">LIFE STADIUM</p>
+    <h1>生きるエネルギー大爆発時計</h1>
+    <p class="tagline">これまで生きてきた奇跡を、スタジアムのゴールのように祝おう。</p>
+  </header>
+
+  <section class="hero hidden panel" id="hero">
+    <p class="hero-label" id="heroLabel">残り時間 / TIME LEFT</p>
+    <div class="years"><span id="years">--.---------</span><span class="u" id="unit">年</span></div>
+    <p class="subline" id="subline">—</p>
+    <p class="burn">命を燃やせ 🔥</p>
+  </section>
+
+  <section class="panel hidden" id="bonus">
+    <p class="bl">BONUS TIME 🎉</p>
+    <div class="bd"><span id="bonusDays">0</span> 日目</div>
+    <p class="subline" style="color:var(--muted);font-weight:500;font-size:0.82rem;margin-top:8px">想定寿命を超えて生きている——ここからは全部、ボーナスの自由時間。</p>
+  </section>
+
+  <div class="grid hidden" id="stats">
+    <div class="stat pink"><p class="k">これまで生きた日数</p><p class="v"><span id="lived">0</span><span>日</span></p></div>
+    <div class="stat gold"><p class="k">打ってきた鼓動</p><p class="v"><span id="beats">0</span><span>回</span></p></div>
+    <div class="stat cyan"><p class="k">過ごしてきた週末</p><p class="v"><span id="wkPast">0</span><span>回</span></p></div>
+    <div class="stat pink"><p class="k" id="wk4Label">残りの週末</p><p class="v"><span id="wk4">0</span><span>回</span></p></div>
+  </div>
+
+  <section class="panel input">
+    <div class="field">
+      <label class="fl" for="birth">生年月日</label>
+      <input type="date" id="birth" min="1900-01-01" />
+    </div>
+    <div class="field">
+      <label class="fl">想定寿命（日本の平均寿命が初期値）</label>
+      <div class="life-row">
+        <input type="range" id="life" min="60" max="110" step="1" value="84" />
+        <b id="lifeVal">84</b><span class="u">歳</span>
+      </div>
+    </div>
+  </section>
+
+  <button class="measure" id="measure">人生の残り時間を測る</button>
+  <p class="err" id="err">生年月日を入力してください（未来の日付は選べません）。</p>
+
+  <div id="shareRow" class="hidden">
+    <a class="share" id="share" href="#" target="_blank" rel="noopener noreferrer">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644z"/></svg>
+      結果をXでシェア
+    </a>
+    <!-- ▼ 誘導バナー：href とテキストをあなたの本命ページに差し替えてください ▼ -->
+    <a class="banner" id="banner" href="#">▶ 他のツールでも遊ぶ <b>→ 個人時価総額シミュレーター / 404ゲーム</b></a>
+  </div>
+
+  <p class="disclaimer">この時計は平均寿命に基づく統計的な目安であり、実際の寿命を予測するものではありません。目的はただひとつ——今この瞬間の時間に、思いきり光を当てることです。</p>
+</main>
+
+<!-- ここにGoogle AdSenseなどの広告コードを貼り付ける -->
+<div id="adSlot" style="display:none"></div>
+
+<script>
+(function(){
+"use strict";
+var RM = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+var $ = function(id){ return document.getElementById(id); };
+var YEAR_MS = 365.2425*86400000, DAY = 86400000, HB = 0.82;
+
+/* ================= life data ================= */
+var birth=null, lifespan=84, measured=false, bonusMode=false;
+var cur={ years:0, daysLived:0, bonusDays:0 };
+var birthEl=$("birth"), lifeEl=$("life"), lifeVal=$("lifeVal"), errEl=$("err");
+birthEl.max = new Date().toISOString().slice(0,10);
+
+function fillLife(){ var mn=+lifeEl.min,mx=+lifeEl.max,v=+lifeEl.value; lifeEl.style.setProperty("--fill",(v-mn)/(mx-mn)*100+"%"); }
+fillLife();
+
+function readout(){
+  if(!measured || !birth){ return; }
+  var now=Date.now(), end=birth.getTime()+lifespan*YEAR_MS, remain=end-now, lived=now-birth.getTime();
+  var daysLived=Math.floor(lived/DAY), weekends=Math.floor(daysLived/7), beats=Math.floor(lived/1000*(72/60));
+  cur.daysLived=daysLived; cur.years=remain/YEAR_MS;
+  $("lived").textContent=daysLived.toLocaleString("ja-JP");
+  $("beats").textContent=beats.toLocaleString("ja-JP");
+  $("wkPast").textContent=weekends.toLocaleString("ja-JP");
+  if(remain>0){
+    if(bonusMode){ bonusMode=false; $("bonus").classList.add("hidden"); $("hero").classList.remove("hidden"); }
+    $("heroLabel").textContent="残り時間 / TIME LEFT"; $("unit").textContent="年";
+    $("years").textContent=(remain/YEAR_MS).toFixed(9);
+    var d=Math.floor(remain/DAY), r=remain-d*DAY, h=Math.floor(r/3.6e6), m=Math.floor((r%3.6e6)/6e4), s=(r%6e4)/1000;
+    $("subline").textContent="= "+d.toLocaleString("ja-JP")+"日 "+h+"時間 "+m+"分 "+s.toFixed(1)+"秒";
+    $("wk4Label").textContent="残りの週末"; $("wk4").textContent=Math.floor((remain/DAY)/7).toLocaleString("ja-JP");
+  } else {
+    if(!bonusMode){ bonusMode=true; $("hero").classList.add("hidden"); $("bonus").classList.remove("hidden"); }
+    var bMs=now-end, bDays=Math.floor(bMs/DAY)+1;
+    cur.bonusDays=bDays;
+    $("bonusDays").textContent=bDays.toLocaleString("ja-JP");
+    $("wk4Label").textContent="ボーナス日数"; $("wk4").textContent=bDays.toLocaleString("ja-JP");
+  }
+}
+function buildShare(){
+  var origin = /^https?:$/.test(location.protocol) ? location.origin+location.pathname : "";
+  var txt;
+  if(bonusMode) txt="私は想定寿命を超えてボーナスタイム"+cur.bonusDays+"日目！これまで"+cur.daysLived.toLocaleString("ja-JP")+"日を生きてきた！命を燃やせ！ #LIFESTADIUM";
+  else txt="私の人生の残り時間は"+cur.years.toFixed(1)+"年！これまで"+cur.daysLived.toLocaleString("ja-JP")+"日を生きてきた！命を燃やせ！ #LIFESTADIUM";
+  $("share").href="https://x.com/intent/post?text="+encodeURIComponent(txt)+(origin?"&url="+encodeURIComponent(origin):"");
+}
+
+/* ================= canvas engine ================= */
+var cv=$("fx"), ctx=cv.getContext("2d",{alpha:false});
+var W=0,H=0,DPR=1,cx=0,cy=0,N=2500;
+var px=new Float32Array(N),py=new Float32Array(N),vx=new Float32Array(N),vy=new Float32Array(N),bs=new Float32Array(N),ph=new Float32Array(N),col=new Uint8Array(N);
+var conf=[], shocks=[], t=0, last=0, raf=0, fountainT=0;
+var CONF_BURST=["#FFD54A","#FFE9A0","#DCE3EE","#C0CAD8","#00E5FF","#FF2E88","#8CFF6A","#B18BFF"];
+var CONF_GOLD=["#FFD54A","#FFC211","#FFE9A0","#FFB000","#FFF3C0"];
+
+function glow(rgb){
+  var c=document.createElement("canvas"); c.width=c.height=32; var g=c.getContext("2d");
+  var r=g.createRadialGradient(16,16,0,16,16,16);
+  r.addColorStop(0,"rgba("+rgb+",1)"); r.addColorStop(0.35,"rgba("+rgb+",0.55)"); r.addColorStop(1,"rgba("+rgb+",0)");
+  g.fillStyle=r; g.beginPath(); g.arc(16,16,16,0,6.2832); g.fill(); return c;
+}
+var SPR=[ glow("255,46,136"), glow("0,229,255") ];
+
+function resize(){
+  DPR=Math.min(1.75, window.devicePixelRatio||1);
+  W=window.innerWidth; H=window.innerHeight; cx=W/2; cy=H/2;
+  cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR); cv.style.width=W+"px"; cv.style.height=H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0); ctx.fillStyle="#04060B"; ctx.fillRect(0,0,W,H);
+  if(!seeded){ for(var i=0;i<N;i++){ px[i]=Math.random()*W; py[i]=Math.random()*H; vx[i]=0; vy[i]=0; bs[i]=5+Math.random()*Math.random()*9; ph[i]=Math.random()*6.28; col[i]=Math.random()<0.5?0:1; } seeded=true; }
+}
+var seeded=false;
+
+function beat(){ var p=(t%HB)/HB, lub=Math.exp(-Math.pow((p-0.06)/0.045,2)), dub=0.75*Math.exp(-Math.pow((p-0.22)/0.05,2)); return Math.min(1,lub+dub); }
+function flow(x,y){ return (Math.sin(x*0.0016+t*0.05)+Math.cos(y*0.0021-t*0.04)+Math.sin((x+y)*0.0011+t*0.03))*1.4; }
+
+function addShock(x,y,strong){ shocks.push({ x:x,y:y,r:0,age:0,life:0.95,str:strong?1300:900, col: Math.random()<0.5?"255,46,136":"0,229,255" }); }
+
+function confetti(x,y,intensity,pal,mode){
+  var m=Math.max(1,Math.min(intensity,6)), nc=Math.round((RM?16:38)*m);
+  for(var i=0;i<nc;i++){
+    var a,sp;
+    if(mode==="up"){ a=-Math.PI/2+(Math.random()-0.5)*1.1; sp=340+Math.random()*380; }
+    else{ a=Math.random()*6.2832; sp=(RM?130:210)+Math.random()*(RM?200:440)*Math.min(m,4); }
+    conf.push({ x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-(mode==="up"?0:70), w:5+Math.random()*7,h:9+Math.random()*11, rot:Math.random()*6.28,vr:(Math.random()-0.5)*13, col:pal[(Math.random()*pal.length)|0], life:1.6+Math.random()*1.6, sway:Math.random()*6.28 });
+  }
+  if(conf.length>520) conf.splice(0,conf.length-520);
+}
+function bigBang(){
+  // 中央から放射 + 上部からの雨
+  confetti(cx,cy,6,CONF_BURST,"out");
+  for(var i=0;i<(RM?24:56);i++){ var x=Math.random()*W; conf.push({ x:x,y:-20-Math.random()*H*0.3, vx:(Math.random()-0.5)*90, vy:150+Math.random()*200, w:5+Math.random()*7,h:9+Math.random()*11, rot:Math.random()*6.28,vr:(Math.random()-0.5)*12, col:CONF_BURST[(Math.random()*CONF_BURST.length)|0], life:2.4+Math.random()*1.8, sway:Math.random()*6.28 }); }
+  if(conf.length>520) conf.splice(0,conf.length-520);
+  addShock(cx,cy,true);
+}
+
+function update(dt){
+  var i,p,s;
+  for(i=shocks.length-1;i>=0;i--){ s=shocks[i]; s.age+=dt; s.r+=(RM?280:540)*dt; if(s.age>s.life) shocks.splice(i,1); }
+  for(i=0;i<N;i++){
+    var a=flow(px[i],py[i]); vx[i]+=Math.cos(a)*0.03; vy[i]+=Math.sin(a)*0.03;
+    for(var j=0;j<shocks.length;j++){ s=shocks[j]; var dx=px[i]-s.x,dy=py[i]-s.y,d=Math.sqrt(dx*dx+dy*dy)||0.001,band=Math.abs(d-s.r);
+      if(band<46){ var f=(1-band/46)*(1-s.age/s.life)*s.str; vx[i]+=dx/d*f*dt; vy[i]+=dy/d*f*dt; } }
+    vx[i]*=0.94; vy[i]*=0.94; px[i]+=vx[i]; py[i]+=vy[i];
+    if(px[i]<-8)px[i]=W+8; else if(px[i]>W+8)px[i]=-8;
+    if(py[i]<-8)py[i]=H+8; else if(py[i]>H+8)py[i]=-8;
+  }
+  for(i=conf.length-1;i>=0;i--){ p=conf[i]; p.life-=dt; if(p.life<=0||p.y>H+40){ conf.splice(i,1); continue; } p.vy+=900*dt; p.vx*=0.99; p.sway+=dt*6; p.x+=(p.vx+Math.sin(p.sway)*46)*dt; p.y+=p.vy*dt; p.rot+=p.vr*dt; }
+  if(measured && bonusMode){ fountainT-=dt; if(fountainT<=0){ fountainT=0.7; confetti(W*(0.15+Math.random()*0.7),H+10,2,CONF_GOLD,"up"); } }
+}
+
+function draw(){
+  var pulse=beat();
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.fillStyle="rgba(4,6,11,0.34)"; ctx.fillRect(0,0,W,H);
+  // heartbeat vignette
+  ctx.globalCompositeOperation="lighter";
+  var vg=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*0.62);
+  vg.addColorStop(0,"rgba(255,46,136,"+(0.03+pulse*0.05)+")"); vg.addColorStop(0.5,"rgba(0,229,255,"+(0.015+pulse*0.03)+")"); vg.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  // particles (pulse expand + brighten)
+  var exp=1+pulse*0.035;
+  for(var i=0;i<N;i++){
+    var rx=cx+(px[i]-cx)*exp, ry=cy+(py[i]-cy)*exp;
+    var sz=bs[i]*(0.7+pulse*1.0);
+    var tw=0.55+0.45*Math.sin(t*2+ph[i]);
+    ctx.globalAlpha=(0.32+pulse*0.5)*(0.55+0.45*tw);
+    ctx.drawImage(SPR[col[i]], rx-sz*0.5, ry-sz*0.5, sz, sz);
+  }
+  ctx.globalAlpha=1;
+  // shock rings
+  for(i=0;i<shocks.length;i++){ var s=shocks[i], al=1-s.age/s.life;
+    ctx.strokeStyle="rgba("+s.col+","+(al*0.5)+")"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,6.2832); ctx.stroke();
+    if(s.age<0.26){ var rg=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,120), ia=(1-s.age/0.26)*0.45; rg.addColorStop(0,"rgba("+s.col+","+ia+")"); rg.addColorStop(1,"rgba("+s.col+",0)"); ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(s.x,s.y,120,0,6.2832); ctx.fill(); }
+  }
+  ctx.globalCompositeOperation="source-over";
+  // confetti (solid, on top)
+  for(i=0;i<conf.length;i++){ var p=conf[i]; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.globalAlpha=Math.min(1,p.life*1.4); ctx.fillStyle=p.col; ctx.fillRect(-p.w*0.5,-p.h*0.5,p.w,p.h); ctx.restore(); }
+  ctx.globalAlpha=1;
+}
+
+function loop(now){ raf=requestAnimationFrame(loop); var dt=Math.min(50,now-last)/1000; last=now; t+=dt; update(dt); readout(); draw(); }
+
+/* ================= interactions ================= */
+function measure(){
+  if(!birthEl.value){ errEl.style.display="block"; return; }
+  var d=new Date(birthEl.value+"T00:00:00");
+  if(isNaN(d.getTime())||d.getTime()>Date.now()){ errEl.style.display="block"; return; }
+  errEl.style.display="none";
+  birth=d; lifespan=+lifeEl.value; measured=true;
+  $("hero").classList.remove("hidden"); $("stats").classList.remove("hidden"); $("shareRow").classList.remove("hidden");
+  $("measure").textContent="🎉 もう一度、命を祝う";
+  readout(); buildShare(); bigBang();
+}
+$("measure").addEventListener("click", measure);
+birthEl.addEventListener("change", function(){ if(birthEl.value){ var d=new Date(birthEl.value+"T00:00:00"); if(!isNaN(d.getTime())&&d.getTime()<=Date.now()){ birth=d; if(measured){ readout(); buildShare(); } } } });
+lifeEl.addEventListener("input", function(){ lifespan=+lifeEl.value; lifeVal.textContent=lifespan; fillLife(); if(measured){ readout(); buildShare(); } });
+
+/* tap anywhere on the field -> shockwave (UI elements capture their own taps) */
+cv.addEventListener("pointerdown", function(e){ addShock(e.clientX,e.clientY,false); });
+cv.addEventListener("touchmove", function(e){ e.preventDefault(); }, { passive:false });
+
+document.addEventListener("visibilitychange", function(){ if(document.hidden){ cancelAnimationFrame(raf); } else { last=performance.now(); raf=requestAnimationFrame(loop); } });
+window.addEventListener("resize", resize);
+
+resize(); last=performance.now(); raf=requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
